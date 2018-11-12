@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const jwt = require('jsonwebtoken')
+const expressjwt = require('express-jwt')
 const port =3000
 
 // use the body parser middleware to process json
@@ -39,9 +40,17 @@ app.post('/login', (req,res) =>{
         token: token
     });
 })
+const jwtCheck = expressjwt({
+    secret:"myKey"
 
-app.get('/user', (req,res) =>{
-    res.status(200).send(users)
+});
+// protected route that can only be accessed by logged in users
+app.get('/user',jwtCheck,(req,res) =>{
+    try {
+        res.status(200).send(users)
+    } catch (error) {
+        res.status(400).send(error)   
+    }
 })
 
 app.get("*", (req,res) =>{
